@@ -23,9 +23,16 @@ export class AuthController {
    */
 
     static login = asyncHandler(async (req: Request, res: Response) => {
-        const { email, password } = req.body;
 
-        const result = await AuthService.login(email, password);
+        const result = await AuthService.login(req.body);
+
+
+        res.cookie("accessToken", result.token, {
+            httpOnly: true,     // JS cannot read it
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        })
 
         res.status(200).json({
             success: true,

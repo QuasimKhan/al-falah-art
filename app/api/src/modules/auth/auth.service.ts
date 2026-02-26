@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken";
-import { SignupInput } from "./auth.schema";
+import { LoginInput, SignupInput } from "./auth.schema";
 import { IUser, User, UserRole } from "./auth.model";
 import { env } from "../../config/env";
 import { ApiError } from "../../utils/ApiError";
@@ -31,7 +31,10 @@ export class AuthService {
 
 
     //LOGIN USER
-    static async login(email: string, password: string): Promise<{ user: IUser; token: string }> {
+    static async login(data: LoginInput): Promise<{ user: IUser; token: string }> {
+        const { email, password } = data
+
+
         /** Explicitly select password because it is excluded by default */
         const user = await User.findOne({ email }).select("+password");
         if (!user) {

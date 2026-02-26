@@ -9,20 +9,24 @@ import { IUser, User } from "../modules/auth/auth.model";
  * Extend Request type to include authenticated user
  */
 export interface AuthRequest extends Request {
-    user?: Omit<IUser, "password">;
+    user?: {
+        id: string,
+        role: string,
+        email: string
+    }
 }
 
 export const authenticate = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
         const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : req.cookies.accessToken
+        if (!token) {
             return res.status(401).json({
                 success: false,
                 message: "Unauthorized"
             });
         }
 
-        const token = authHeader.split(" ")[1]
         const decoded = Jwt.verify(token, env.JWT_SECRET) as JwtPayload & {
             id: string;
             role: string;
@@ -37,7 +41,11 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
             });
         }
 
-        req.user = user;
+        req.user = {
+            id: user._id.toString(),
+            role: user.role,
+            email: user.email
+        }
 
         next()
     } catch (error) {
