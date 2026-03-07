@@ -2,6 +2,7 @@ import express from "express"
 import cors from "cors"
 import authRoutes from "./modules/auth/auth.routes"
 import productRoutes from "./modules/products/product.routes"
+import orderRoutes from "./modules/orders/order.routes"
 import { errorMiddleware } from "./middlewares/error.middleware"
 import morgan from "morgan"
 
@@ -15,6 +16,7 @@ app.use(morgan('dev'));
 
 app.use("/api/auth", authRoutes)
 app.use("/api/products", productRoutes)
+app.use("/api/orders", orderRoutes)
 
 
 app.get("/health", function (_req, res) {
