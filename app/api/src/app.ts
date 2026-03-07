@@ -1,6 +1,7 @@
 import express from "express"
 import cors from "cors"
-import authRoute from "./modules/auth/auth.routes"
+import authRoutes from "./modules/auth/auth.routes"
+import productRoutes from "./modules/products/product.routes"
 import { errorMiddleware } from "./middlewares/error.middleware"
 import morgan from "morgan"
 
@@ -12,7 +13,9 @@ app.use(morgan('dev'));
 
 
 
-app.use("/api/auth", authRoute)
+app.use("/api/auth", authRoutes)
+app.use("/api/products", productRoutes)
+
 
 app.get("/health", function (_req, res) {
     res.status(200).json({
