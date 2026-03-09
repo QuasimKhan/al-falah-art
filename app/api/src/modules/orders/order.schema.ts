@@ -37,3 +37,17 @@ export const updateOrderStatusSchema = z.object({
 
 export type UpdateOrderStatusInput =
     z.infer<typeof updateOrderStatusSchema>["body"];
+
+
+
+/**
+ * Admin review schema
+ */
+export const reviewOrderSchema = z.object({
+    body: z.object({
+        finalAmount: z.number().min(1)
+    })
+});
+
+export type ReviewOrderInput =
+    z.infer<typeof reviewOrderSchema>["body"];

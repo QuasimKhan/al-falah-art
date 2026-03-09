@@ -4,7 +4,8 @@ import mongoose, { Document } from "mongoose";
  * Order status lifecycle
  */
 export enum OrderStatus {
-    PENDING = "PENDING",
+    PENDING_REVIEW = "PENDING_REVIEW",
+    AWAITING_PAYMENT = "AWAITING_PAYMENT",
     CONFIRMED = "CONFIRMED",
     PRINTING = "PRINTING",
     COMPLETED = "COMPLETED",
@@ -35,6 +36,7 @@ export interface IOrder extends Document {
     contentFile?: string;
 
     totalAmount: number;
+    finalAmount: number;
 
     orderStatus: OrderStatus;
     paymentStatus: PaymentStatus;
@@ -89,10 +91,14 @@ const orderSchema = new mongoose.Schema<IOrder>({
         required: true
     },
 
+    finalAmount: {
+        type: Number
+    },
+
     orderStatus: {
         type: String,
         enum: Object.values(OrderStatus),
-        default: OrderStatus.PENDING
+        default: OrderStatus.PENDING_REVIEW
     },
 
     paymentStatus: {

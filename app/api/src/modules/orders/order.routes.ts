@@ -2,7 +2,7 @@ import { Router } from "express";
 import { OrderController } from "./order.controller";
 import { authenticate, authorize } from "../../middlewares/auth.middleware";
 import { validate } from "../../middlewares/validate.middleware";
-import { createOrderSchema, updateOrderStatusSchema } from "./order.schema";
+import { createOrderSchema, reviewOrderSchema, updateOrderStatusSchema } from "./order.schema";
 import { UserRole } from "../auth/auth.model";
 
 const router = Router();
@@ -22,6 +22,18 @@ router.get(
     OrderController.myOrders
 );
 
+router.post(
+    "/:id/pay",
+    authenticate,
+    OrderController.createPayment
+);
+
+router.post(
+    "/verify-payment",
+    authenticate,
+    OrderController.verifyPayment
+);
+
 /** Admin routes */
 
 router.get(
@@ -38,5 +50,7 @@ router.patch(
     validate(updateOrderStatusSchema),
     OrderController.updateStatus
 );
+
+router.patch("/:id/review", authenticate, authorize(UserRole.ADMIN), validate(reviewOrderSchema), OrderController.review)
 
 export default router;

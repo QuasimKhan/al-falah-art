@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { CreateOrderInput } from "./order.schema";
 import { Product } from "../products/product.model";
 import { ApiError } from "../../utils/ApiError";
-import { Order } from "./order.model";
+import { Order, OrderStatus } from "./order.model";
 
 export class OrderService {
     /**
@@ -53,18 +53,47 @@ export class OrderService {
      * Admin: update order status
      */
 
-    static async updateOrderStatus(orderId: string, orderStatus: string) {
+    static async updateOrderStatus(orderId: string, orderStatus: OrderStatus) {
         const order = await Order.findById(orderId);
 
         if (!order) {
             throw new ApiError(404, "Order not found")
         }
 
-        order.orderStatus = orderStatus as any;
+        order.orderStatus = orderStatus;
         await order.save()
 
 
-        return order
+        return order;
+    }
+
+    /**
+ * Admin reviews order and sets final price
+ */
+
+    static async reviewOrder(orderId: string, finalAmount: number) {
+        const order = await Order.findById(orderId);
+
+        if (!order) {
+            throw new ApiError(404, "Order not found");
+        }
+
+        if (order.orderStatus !== OrderStatus.AWAITING_PAYMENT) {
+            throw new ApiError(400, "Order already reviewed");
+        }
+
+        order.finalAmount = finalAmount;
+        order.orderStatus = OrderStatus.AWAITING_PAYMENT;
+
+        await order.save();
+
+
+        return order;
+
+
+
+
+
     }
 
 }

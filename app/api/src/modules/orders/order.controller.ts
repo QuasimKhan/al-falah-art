@@ -3,6 +3,7 @@ import { AuthRequest } from "../../middlewares/auth.middleware";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { OrderService } from "./order.service";
 import { success } from "zod";
+import { PaymentService } from "./payment.service";
 
 
 export class OrderController {
@@ -45,6 +46,20 @@ export class OrderController {
         });
     })
 
+    /**
+     * Admin: reviews order and sets price
+     */
+
+    static review = asyncHandler(async (req: AuthRequest, res: Response) => {
+        const order = await OrderService.reviewOrder(req.params.id, req.body.finalAmount);
+
+
+        res.status(200).json({
+            success: true,
+            data: order
+        })
+    })
+
 
     /**
      * Admin: update order status
@@ -57,4 +72,33 @@ export class OrderController {
             data: order
         });
     })
+
+
+    /**
+ * Create Razorpay payment order
+ */
+    static createPayment = asyncHandler(async (req: AuthRequest, res: Response) => {
+        const payment = await PaymentService.createPayment(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            data: payment
+        });
+    });
+
+    /**
+     * Verify Razorpay payment
+     */
+    static verifyPayment = asyncHandler(async (req: AuthRequest, res: Response) => {
+        const order = await PaymentService.verifyPayment(
+            req.body.razorpay_order_id,
+            req.body.razorpay_payment_id,
+            req.body.razorpay_signature
+        );
+
+        res.status(200).json({
+            success: true,
+            data: order
+        });
+    });
 }
